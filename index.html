@@ -99,8 +99,8 @@ input,textarea,select{font-family:inherit}
 .admin-only{display:none!important}
 body.admin .admin-only{display:inline-flex!important}
 body.admin .admin-only.block{display:block!important}
-body.fbmode .local-only{display:none!important}
-body:not(.fbmode) .fb-only{display:none!important}
+body.fbmode .local-only,body.admin.fbmode .admin-only.local-only{display:none!important}
+body:not(.fbmode) .fb-only,body.admin:not(.fbmode) .admin-only.fb-only{display:none!important}
 #acct{font-size:12.5px;color:#9fdcff;align-self:center}
 .usage{max-width:900px;margin:0 auto 18px;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);font-size:13px;color:#c9d3ea}
 .panel .usage{background:#fff;border-color:#e6e0d3;color:#444;margin:14px 0 0}
@@ -171,6 +171,8 @@ body:not(.fbmode) .fb-only{display:none!important}
 .ctab.act{background:var(--c);border-color:var(--c);color:#fff;font-weight:700;box-shadow:0 6px 18px -6px var(--c)}
 #grid.cats{grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:clamp(18px,2.6vw,28px);perspective:none}
 #grid.cats{grid-auto-rows:1fr}
+#grid.cats.two{grid-template-columns:repeat(2,minmax(0,1fr));max-width:1180px}
+@media(max-width:760px){#grid.cats.two{grid-template-columns:1fr}}
 /* ---- 벤토형 첫 화면: 중점 카테고리 2×2 ---- */
 #grid.cats.bento{grid-template-columns:repeat(6,minmax(0,1fr))}
 #grid.cats.bento .cat-card{grid-column:span 2}
@@ -184,7 +186,6 @@ body:not(.fbmode) .fb-only{display:none!important}
 @media(max-width:640px){#grid.cats.bento{grid-template-columns:1fr}#grid.cats.bento .cat-card{grid-column:auto!important}}
 /* 중점 카드: 다른 카드와 같은 크기 · 강조 표시만 유지 */
 .cat-card.feat{padding:24px 24px 20px;gap:14px}
-.cat-card.feat .cc-num{display:none}
 .cat-card.feat .feat-ribbon{margin-left:auto;align-self:flex-start;padding:6px 13px;font-size:12.5px;white-space:nowrap}
 .cat-card.feat .cc-icon{width:58px;height:58px;font-size:30px;border-radius:16px}
 .cat-card.feat .cc-name{font-size:clamp(24px,2.6vw,30px)}
@@ -434,6 +435,14 @@ footer{text-align:center;padding:26px;color:#6f7ea6;font-size:12.5px;border-top:
 .book-card .bc-teacher{font-size:5.6cqw;margin-top:1.5cqw}
 .book-card .bc-counts{gap:2.5cqw}
 .book-card .bc-counts span{font-size:5.4cqw;padding:1.2cqw 3cqw}
+
+/* ---- 강조 카테고리: 크기·글자는 다른 카드와 동일, 금색 테두리만 ---- */
+.cat-card.feat{padding:24px 24px 20px;gap:14px}
+.cat-card.feat .cc-icon{width:58px;height:58px;font-size:30px;border-radius:16px}
+.cat-card.feat .cc-name{font-size:clamp(22px,2.4vw,27px)}
+.cat-card.feat .cc-en{font-size:11px}
+.cat-card.feat .cc-num{font-size:58px;right:20px;top:10px}
+.cat-card.feat::after{width:240px;height:240px;right:-80px;top:-90px;opacity:.55}
 </style>
 </head>
 <body>
@@ -566,7 +575,7 @@ footer{text-align:center;padding:26px;color:#6f7ea6;font-size:12.5px;border-top:
         <label class="wide">영문 표기<input data-c="en" placeholder="예: DIGITAL LITERACY"></label>
         <label class="wide">소개 (카드에 표시, 선택)<textarea data-c="desc" rows="2"></textarea></label>
         <label class="wide">주제별 선반 (한 줄에 하나 · 비워 두면 선반 없이 한 줄 서가)<textarea id="cmShelves" rows="4" placeholder="🔌 코딩·피지컬 컴퓨팅&#10;🤖 AI·바이브코딩&#10;🌐 실감형·메타버스"></textarea></label>
-        <label class="wide chk"><input type="checkbox" id="cmFeatured"> ★ 첫 화면에서 크게 강조 (중점 과제)</label>
+        <label class="wide chk"><input type="checkbox" id="cmFeatured"> 첫 화면에서 금색 테두리로 강조</label>
       </div>
       <div style="font-size:12.5px;color:#777">이 카테고리의 책(항목)은 카테고리를 연 뒤 [＋ 항목 추가]로 만들 수 있습니다.</div>
     </div>
@@ -672,13 +681,14 @@ const SECTIONS = [
 ];
 const LAYOUT_VER = 2, LEGACY = '__legacy';
 const DEF_CATS = [
-  {id:'literacy', name:'디지털 리터러시', en:'DIGITAL LITERACY',     icon:'🛡️', color:'#2463a8', books:[['AI 윤리 수업','🤖','#2463a8'],['디지털리터러시 컨텐츠 대회','🎬','#1b6e9e']]},
-  {id:'letter',   name:'아침편지',       en:'MORNING LETTER',       icon:'✉️', color:'#c27c0e', books:[['자작자작','✍️','#c27c0e']]},
-  {id:'digital',  name:'디지털 기반 교육', en:'DIGITAL-BASED LEARNING', icon:'💻', color:'#0b7e8c', books:[['로봇(드론)','🦾','#4d6575']]},
-  {id:'contest',  name:'교내 대회',      en:'SCHOOL CONTESTS',      icon:'🏆', color:'#b03a2e', books:[['과학경시대회','🔬','#b03a2e']]},
-  {id:'fusion',   name:'융합수업',       en:'CONVERGENCE CLASS',    icon:'🔗', color:'#6c3483', books:[['국어+과학','📖','#b03a2e'],['영어+정보','💻','#2463a8'],['역사+과학','📜','#7b5a43'],['영어+미술','🎨','#c0561b'],['도덕+국어+정보','🤝','#a93f6b'],['기술가정+진로','🛠️','#4d6575'],['진로+도덕','🧭','#1e8449']]},
-  {id:'aidt',     name:'AIDT',          en:'AI DIGITAL TEXTBOOK',  icon:'📱', color:'#117a65', books:[['영어','🌏','#2463a8'],['수학','📐','#6c3483']]}
+  {id:'literacy', name:'생각하는 디지털 시민',   en:'THINKING DIGITAL CITIZENS', icon:'🛡️', color:'#2463a8', books:[['AI 윤리 수업','🤖','#2463a8','literacy-1'],['디지털리터러시 컨텐츠 대회','🎬','#1b6e9e','literacy-2'],['아침편지|자작자작','✍️','#c27c0e','letter-1']]},
+  {id:'digital',  name:'코드로 그리는 상상',     en:'IMAGINATION IN CODE',       icon:'💻', color:'#0b7e8c', books:[['로봇(드론)','🦾','#4d6575','digital-1']]},
+  {id:'aidt',     name:'AIDT, 교과 수업이 되다', en:'AIDT IN EVERY SUBJECT',     icon:'📱', color:'#117a65', books:[
+    ['수학','📐','#6c3483','aidt-2'],['영어','🌏','#2463a8','aidt-1'],['국어','📖','#b03a2e','aidt-3'],['과학','🔬','#117a65','aidt-4'],
+    ['미술','🎨','#c0561b','aidt-5'],['사회','🏛️','#b9770e','aidt-6'],['한문','📜','#7b5a43','aidt-7']]},
+  {id:'fusion',   name:'경계를 넘는 수업',       en:'BEYOND BOUNDARIES',         icon:'🔗', color:'#6c3483', books:[['국어+과학','📖','#b03a2e'],['영어+정보','💻','#2463a8'],['역사+과학','📜','#7b5a43'],['영어+미술','🎨','#c0561b'],['도덕+국어+정보','🤝','#a93f6b'],['기술가정+진로','🛠️','#4d6575'],['진로+도덕','🧭','#1e8449']]}
 ];
+const CAT_VER = 1;   // 카테고리 구성 버전 (이미 저장된 자료를 새 구성으로 바꿀 때 사용)
 /* 주제별 선반 기본값 (디지털 기반 교육) */
 const DEF_SHELVES = { digital: [
   {id:'sh-code', name:'🔌 피지컬 코딩'},
@@ -707,10 +717,10 @@ const digitalBooks = () => DIGITAL_BOOKS.map(b => ({id:b[0], cat:'digital', shel
 const defShelves = id => (DEF_SHELVES[id] || []).map(o => Object.assign({}, o));
 const defCats = () => DEF_CATS.map(c => ({id:c.id, name:c.name, en:c.en, icon:c.icon, color:c.color, desc:'', shelves:defShelves(c.id)}));
 const DEF_SETTINGS = {year:'2026학년도', school:'창신중학교', title:'디지털 연구학교', subtitle:'AI·디지털 기반 수업 혁신, 배움이 자라는 교실',
-  introVideo:null, introYoutube:'', introSeconds:15, imgTarget:250000, featuredCat:'aidt', digitalVer:DIGITAL_VER};
+  introVideo:null, introYoutube:'', introSeconds:15, imgTarget:250000, featuredCat:'aidt', digitalVer:DIGITAL_VER, catVer:CAT_VER};
 const emptyItems = () => ({plan:[],photo:[],result:[]});
 function defaultBooks(){
-  return DEF_CATS.flatMap(c => c.books.map((b,i) => ({id:`${c.id}-${i+1}`, cat:c.id, shelf:DEF_SHELF_OF[`${c.id}-${i+1}`] || '', name:b[0], icon:b[1], color:b[2], teacher:'', desc:'', items:emptyItems()}))).concat(digitalBooks());
+  return DEF_CATS.flatMap(c => c.books.map((b,i) => ({id:b[3] || `${c.id}-${i+1}`, cat:c.id, shelf:DEF_SHELF_OF[b[3] || `${c.id}-${i+1}`] || '', name:b[0], icon:b[1], color:b[2], teacher:'', desc:'', items:emptyItems()}))).concat(digitalBooks());
 }
 function defaultState(){
   return { settings: Object.assign({}, DEF_SETTINGS, {categories:defCats(), layoutVer:LAYOUT_VER}), subjects: defaultBooks() };
@@ -727,9 +737,41 @@ const nameCls = n => {
   return lines >= 5 ? 'stack5' : L >= 13 ? 'xlong' : (L >= 8 || lines >= 2) ? 'long' : '';
 };
 const countItems = x => SECTIONS.reduce((a,sec) => a + x.items[sec.key].length, 0);
+function migrateCats(s){
+  let cs = s.settings.categories;
+  /* 이름 변경 */
+  DEF_CATS.forEach(d => { const c = cs.find(x => x.id === d.id); if(c){ c.name = d.name; c.en = d.en; } });
+  /* 아침편지 → 생각하는 디지털 시민의 항목으로 */
+  s.subjects.filter(x => x.cat === 'letter').forEach(x => { x.cat = 'literacy'; x.shelf = ''; if(x.name === '자작자작') x.name = '아침편지|자작자작'; });
+  /* 교내 대회 삭제 (자료가 올라가 있던 책만 관리 모드의 '이전 자료'에 보존) */
+  const contest = s.subjects.filter(x => x.cat === 'contest');
+  const keep = contest.filter(x => countItems(x)), drop = contest.filter(x => !countItems(x));
+  if(keep.length){
+    if(!cs.some(c => c.id === LEGACY)) cs.push({id:LEGACY, name:'이전 자료', en:'ARCHIVE', icon:'🗂️', color:'#5b6680', desc:'예전 구성에서 올린 자료입니다. 각 책의 [자료 관리]에서 알맞은 카테고리로 옮겨 주세요.', shelves:[]});
+    keep.forEach(x => { x.cat = LEGACY; x.shelf = ''; });
+  }
+  s.subjects = s.subjects.filter(x => !drop.includes(x));
+  s.legacyDrop = (s.legacyDrop || []).concat(drop.map(x => x.id));
+  cs = cs.filter(c => c.id !== 'letter' && c.id !== 'contest');
+  if(s.settings.featuredCat === 'letter' || s.settings.featuredCat === 'contest') s.settings.featuredCat = 'aidt';
+  /* AIDT 교과: 수학·영어·국어·과학·미술·사회·한문 순서, 없는 교과는 추가 */
+  const aidtDef = DEF_CATS.find(d => d.id === 'aidt').books;
+  const aidtOld = s.subjects.filter(x => x.cat === 'aidt'), used = new Set();
+  const ordered = aidtDef.map(b => {
+    const hit = aidtOld.find(x => !used.has(x) && (x.id === b[3] || x.name === b[0])) ;
+    if(hit){ used.add(hit); return hit; }
+    return {id:b[3], cat:'aidt', shelf:'', name:b[0], icon:b[1], color:b[2], teacher:'', desc:'', items:emptyItems()};
+  });
+  s.subjects = s.subjects.filter(x => x.cat !== 'aidt').concat(ordered, aidtOld.filter(x => !used.has(x)));
+  /* 카테고리 순서: 시민 → 상상 → AIDT → 경계 → (그 밖의 카테고리) → 이전 자료 */
+  const rank = c => { const i = DEF_CATS.findIndex(d => d.id === c.id); return c.id === LEGACY ? 999 : i < 0 ? 500 : i; };
+  s.settings.categories = cs.map((c,i) => [c,i]).sort((a,b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(a => a[0]);
+  s.needsSeed = true;
+}
 function normalize(s){
   if(!s || typeof s !== 'object') return defaultState();
   const savedDigitalVer = +((s.settings || {}).digitalVer) || 0;   // 기본값과 합치기 전에 저장된 값 확인
+  const savedCatVer = +((s.settings || {}).catVer) || 0;
   s.settings = Object.assign({}, DEF_SETTINGS, s.settings || {});
   if(!Array.isArray(s.subjects)) s.subjects = [];
   s.subjects.forEach(x => {
@@ -779,6 +821,8 @@ function normalize(s){
     });
   }
   s.settings.digitalVer = DIGITAL_VER;
+  if(savedCatVer < CAT_VER && !s.freshDigital) migrateCats(s);
+  s.settings.catVer = CAT_VER;
   /* 선반: 카테고리에 선반 정보가 없으면 기본값, 책에 선반이 없으면 기본 배치 */
   s.settings.categories.forEach(c => { if(!Array.isArray(c.shelves)) c.shelves = defShelves(c.id); });
   s.subjects.forEach(x => {
@@ -1108,11 +1152,7 @@ function catCard(c, k){
   const head = `<div class="cc-num">${String(k+1).padStart(2,'0')}</div>
       <div class="cc-head"><div class="cc-icon">${esc(c.icon)}</div><div><div class="cc-en">${esc(c.en || '')}</div><div class="cc-name">${esc(c.name)}</div></div></div>
       ${c.desc ? `<p class="cc-desc">${esc(c.desc)}</p>` : ''}`;
-  if(feat){
-    el.innerHTML = head + `<div class="feat-books">${books.slice(0, 2).map(b => bookCardHTML(b, c, true)).join('')}<div class="feat-ribbon">★ 중점 과제</div></div>
-      <div class="cc-foot"><span>e-Book ${books.length}권 · 자료 ${items}개</span><b>서가 열기 →</b></div>
-      ${admin ? '<button class="cc-edit">✏️ 카테고리 편집</button>' : ''}`;
-  } else {
+  {
     el.innerHTML = head + `
       <div class="cc-chips">${(c.shelves || []).filter(sh => sh.name).length
         ? c.shelves.filter(sh => sh.name).map(sh => `<span>${esc(sh.name)} · ${books.filter(b => b.shelf === sh.id).length}</span>`).join('')
@@ -1135,6 +1175,7 @@ function renderCats(){
   const list = cats().filter(c => c.id !== LEGACY || admin);
   const hasFeat = list.some(c => c.id === state.settings.featuredCat);
   /* 모든 카테고리 카드를 같은 크기로 (중점 카테고리는 강조 표시만) */
+  if(list.filter(c => c.id !== LEGACY).length % 3 !== 0 && list.filter(c => c.id !== LEGACY).length % 2 === 0) g.classList.add('two');
   const cells = list.map((c,k) => catCard(c, k));
   cells.forEach(el => g.appendChild(el));
   if(admin){
@@ -1198,7 +1239,7 @@ function renderShelf(cid){
   setHero(c.en || 'CATEGORY', `${esc(c.icon)} ${esc(c.name)} <em>e-Book</em> 서가`, c.desc || '항목을 선택하면 학업계획서 · 수업활동 사진 · 결과물을 책처럼 넘겨볼 수 있습니다.');
   const tabs = $('#catTabs'); tabs.hidden = false;
   tabs.innerHTML = cats().filter(x => x.id !== LEGACY || admin || x.id === cid).map(x =>
-    `<button class="ctab ${x.id === cid ? 'act' : ''}" style="--c:${esc(x.color)}" data-cat="${esc(x.id)}">${x.id === state.settings.featuredCat ? '★ ' : ''}${esc(x.icon)} ${esc(x.name)}</button>`).join('');
+    `<button class="ctab ${x.id === cid ? 'act' : ''}" style="--c:${esc(x.color)}" data-cat="${esc(x.id)}">${esc(x.icon)} ${esc(x.name)}</button>`).join('');
   tabs.onclick = e => { const b = e.target.closest('[data-cat]'); if(b) go(b.dataset.cat); };
   const books = booksOf(cid), total = books.reduce((a,b) => a + countItems(b), 0);
   const shelves = (c.shelves || []).filter(sh => sh.name && sh.name.trim());
