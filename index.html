@@ -443,6 +443,67 @@ footer{text-align:center;padding:26px;color:#6f7ea6;font-size:12.5px;border-top:
 .cat-card.feat .cc-en{font-size:11px}
 .cat-card.feat .cc-num{font-size:58px;right:20px;top:10px}
 .cat-card.feat::after{width:240px;height:240px;right:-80px;top:-90px;opacity:.55}
+
+/* ---- 카테고리 카드: 실제 하드커버 책등 (단색 · 밝은 톤, 그러데이션 없음) ---- */
+.cc-shelf.real{height:134px;gap:1px;padding:0 4px;border-bottom:0;margin-bottom:10px}
+.cc-shelf.real::after{content:'';position:absolute;left:-6px;right:-6px;bottom:-9px;height:9px;border-radius:2px;background:#c9a874;
+  box-shadow:inset 0 2px 0 #dfc596,inset 0 -2px 0 #a6845a,0 10px 14px -8px rgba(0,0,0,.7)}
+.cc-shelf i.sp{--tone:color-mix(in srgb,var(--sc) 62%,#fff);--deep:color-mix(in srgb,var(--sc) 80%,#141a26);
+  --ink:color-mix(in srgb,var(--sc) 50%,#141a26);--gold:#d9b265;
+  position:relative;z-index:1;flex:none;width:var(--w);height:var(--h);background:var(--tone);border-radius:3px 3px 1px 1px;
+  display:flex;flex-direction:column;align-items:center;overflow:hidden;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sc) 24%,transparent),1px 0 0 rgba(0,0,0,.35);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.cc-shelf i.sp::before,.cc-shelf i.sp::after{content:'';position:absolute;top:0;bottom:0;width:1px;background:color-mix(in srgb,var(--sc) 30%,transparent)}
+.cc-shelf i.sp::before{left:3px}
+.cc-shelf i.sp::after{right:3px}
+.cc-shelf i.sp .hb{flex:none;width:100%;height:3px;background:var(--deep)}
+.cc-shelf i.sp .gl{flex:none;width:100%;height:5px;margin-top:6px;border-top:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold)}
+.cc-shelf i.sp .gl.gb{margin:0 0 5px}
+.cc-shelf i.sp .mk{flex:none;width:7px;height:7px;margin-bottom:6px;border:1.5px solid var(--gold);border-radius:50%}
+.cc-shelf i.sp .tt{flex:none;height:max-content;margin:auto 0;padding:3px 0;writing-mode:vertical-rl;white-space:nowrap;overflow:visible;
+  font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.04em;line-height:var(--w);color:var(--ink)}
+.cc-shelf i.sp.st1 .tt{width:100%;padding:7px 0;background:var(--deep);color:#fff}
+.cc-shelf i.sp.st1 .gl{border-color:#fff;opacity:.85}
+.cc-shelf i.sp.st1 .mk{border-radius:1px;border-color:var(--deep);background:var(--deep)}
+.cc-shelf i.sp.st2 .tt{width:calc(100% - 8px);line-height:calc(var(--w) - 8px);padding:5px 0;background:#fffaf0;color:#2c3443;border-radius:1px;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--sc) 35%,transparent)}
+.cc-shelf i.sp.st2 .gl{height:3px;border-bottom:0}
+.cc-shelf i.sp.lean{transform-origin:100% 100%;transform:rotate(-6deg);margin-left:7px}
+.cat-card:hover .cc-shelf i.sp{transform:translateY(-3px)}
+.cat-card:hover .cc-shelf i.sp:nth-of-type(3n){transform:translateY(-5px)}
+.cat-card:hover .cc-shelf i.sp.lean{transform:rotate(-6deg) translateY(-3px)}
+.cc-shelf .bookend{flex:none;position:relative;z-index:0;width:5px;height:56%;margin-right:3px;background:#aeb6c4;border-radius:2px 2px 0 0;box-shadow:inset -1px 0 0 #8e97a6}
+.cc-shelf .bookend::after{content:'';position:absolute;left:0;bottom:0;width:20px;height:3px;background:#aeb6c4;border-radius:0 2px 0 0}
+
+/* ---- 세워진 책 입체감 (단색 면으로만) ---- */
+.cc-shelf.real{margin-top:auto;padding-top:8px}
+.cc-shelf i.sp{overflow:visible;
+  box-shadow:inset 3px 0 0 rgba(255,255,255,.28),inset 5px 0 0 rgba(255,255,255,.1),inset -4px 0 0 color-mix(in srgb,var(--sc) 30%,transparent),
+             inset 0 0 0 1px color-mix(in srgb,var(--sc) 26%,transparent)}
+.cc-shelf i.sp::before{left:4px}
+.cc-shelf i.sp::after{right:5px}
+/* 윗면: 표지 두께 + 크림색 종이 단면 (뒤쪽 오른편으로 비스듬히) */
+.cc-shelf i.sp .tp{position:absolute;left:0;bottom:100%;width:100%;height:7px;transform-origin:0 100%;transform:skewX(-45deg);
+  background:#f2e8d2;border:1.5px solid var(--deep);border-bottom-width:2px;border-radius:1px 1px 0 0;box-sizing:border-box}
+/* 옆면: 오른쪽 표지 (옆 책보다 높을 때만 보임) */
+.cc-shelf i.sp .sd{position:absolute;left:100%;top:0;bottom:0;width:7px;transform-origin:0 0;transform:skewY(-45deg);
+  background:color-mix(in srgb,var(--sc) 82%,#141a26);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--sc) 60%,#141a26)}
+/* 뒤에 있는 책일수록 아래에: 오른쪽 책이 왼쪽 책의 옆면을 가림 */
+.cc-shelf i.sp:nth-of-type(1){z-index:1}.cc-shelf i.sp:nth-of-type(2){z-index:2}.cc-shelf i.sp:nth-of-type(3){z-index:3}
+.cc-shelf i.sp:nth-of-type(4){z-index:4}.cc-shelf i.sp:nth-of-type(5){z-index:5}.cc-shelf i.sp:nth-of-type(6){z-index:6}
+.cc-shelf i.sp:nth-of-type(7){z-index:7}.cc-shelf i.sp:nth-of-type(8){z-index:8}.cc-shelf i.sp:nth-of-type(9){z-index:9}
+.cc-shelf i.sp:nth-of-type(10){z-index:10}.cc-shelf i.sp:nth-of-type(11){z-index:11}.cc-shelf i.sp:nth-of-type(12){z-index:12}
+.cc-shelf i.sp:nth-of-type(13){z-index:13}.cc-shelf i.sp:nth-of-type(14){z-index:14}
+.cc-shelf i.sp.st1 .tt{width:calc(100% - 1px)}
+/* 선반: 윗면 + 앞면이 있는 두꺼운 나무판, 책 그림자 */
+.cc-shelf.real::before{content:'';position:absolute;left:-2px;right:3px;bottom:0;height:9px;z-index:0;transform-origin:0 100%;transform:skewX(-45deg);
+  background:#d9bd8c;box-shadow:inset 0 1px 0 #e8d2a9}
+.cc-shelf.real::after{left:-6px;right:-6px;bottom:-11px;height:11px;background:#c09a63;box-shadow:inset 0 2px 0 #d6b47d,inset 0 -2px 0 #9c7a4b,0 12px 16px -8px rgba(0,0,0,.75)}
+.cc-shelf i.sp{filter:drop-shadow(4px 1px 0 rgba(60,35,10,.28))}
+/* 북엔드 두께 */
+.cc-shelf .bookend{overflow:visible}
+.cc-shelf .bookend::before{content:'';position:absolute;left:100%;top:0;bottom:3px;width:4px;transform-origin:0 0;transform:skewY(-45deg);background:#7f8898}
 </style>
 </head>
 <body>
@@ -576,6 +637,7 @@ footer{text-align:center;padding:26px;color:#6f7ea6;font-size:12.5px;border-top:
         <label class="wide">소개 (카드에 표시, 선택)<textarea data-c="desc" rows="2"></textarea></label>
         <label class="wide">주제별 선반 (한 줄에 하나 · 비워 두면 선반 없이 한 줄 서가)<textarea id="cmShelves" rows="4" placeholder="🔌 코딩·피지컬 컴퓨팅&#10;🤖 AI·바이브코딩&#10;🌐 실감형·메타버스"></textarea></label>
         <label class="wide chk"><input type="checkbox" id="cmFeatured"> 첫 화면에서 금색 테두리로 강조</label>
+        <label class="wide chk"><input type="checkbox" id="cmNoPlan"> 이 카테고리의 e-Book에서 학업계획서 빼기</label>
       </div>
       <div style="font-size:12.5px;color:#777">이 카테고리의 책(항목)은 카테고리를 연 뒤 [＋ 항목 추가]로 만들 수 있습니다.</div>
     </div>
@@ -681,14 +743,14 @@ const SECTIONS = [
 ];
 const LAYOUT_VER = 2, LEGACY = '__legacy';
 const DEF_CATS = [
-  {id:'literacy', name:'생각하는 디지털 시민',   en:'THINKING DIGITAL CITIZENS', icon:'🛡️', color:'#2463a8', books:[['AI 윤리 수업','🤖','#2463a8','literacy-1'],['디지털리터러시 컨텐츠 대회','🎬','#1b6e9e','literacy-2'],['아침편지|자작자작','✍️','#c27c0e','letter-1']]},
-  {id:'digital',  name:'코드로 그리는 상상',     en:'IMAGINATION IN CODE',       icon:'💻', color:'#0b7e8c', books:[['로봇(드론)','🦾','#4d6575','digital-1']]},
+  {id:'literacy', name:'생각하는 디지털 시민',   en:'THINKING DIGITAL CITIZENS', icon:'🛡️', color:'#2463a8', hidePlan:true, books:[['AI 윤리 수업','🤖','#2463a8','literacy-1'],['디지털리터러시 컨텐츠 대회','🎬','#1b6e9e','literacy-2'],['아침편지|자작자작','✍️','#c27c0e','letter-1']]},
+  {id:'digital',  name:'코드로 그리는 상상',     en:'IMAGINATION IN CODE',       icon:'💻', color:'#0b7e8c', hidePlan:true, books:[['로봇(드론)','🦾','#4d6575','digital-1']]},
   {id:'aidt',     name:'AIDT, 교과 수업이 되다', en:'AIDT IN EVERY SUBJECT',     icon:'📱', color:'#117a65', books:[
     ['수학','📐','#6c3483','aidt-2'],['영어','🌏','#2463a8','aidt-1'],['국어','📖','#b03a2e','aidt-3'],['과학','🔬','#117a65','aidt-4'],
     ['미술','🎨','#c0561b','aidt-5'],['사회','🏛️','#b9770e','aidt-6'],['한문','📜','#7b5a43','aidt-7']]},
   {id:'fusion',   name:'경계를 넘는 수업',       en:'BEYOND BOUNDARIES',         icon:'🔗', color:'#6c3483', books:[['국어+과학','📖','#b03a2e'],['영어+정보','💻','#2463a8'],['역사+과학','📜','#7b5a43'],['영어+미술','🎨','#c0561b'],['도덕+국어+정보','🤝','#a93f6b'],['기술가정+진로','🛠️','#4d6575'],['진로+도덕','🧭','#1e8449']]}
 ];
-const CAT_VER = 1;   // 카테고리 구성 버전 (이미 저장된 자료를 새 구성으로 바꿀 때 사용)
+const CAT_VER = 2;   // 카테고리 구성 버전 (이미 저장된 자료를 새 구성으로 바꿀 때 사용)
 /* 주제별 선반 기본값 (디지털 기반 교육) */
 const DEF_SHELVES = { digital: [
   {id:'sh-code', name:'🔌 피지컬 코딩'},
@@ -715,7 +777,7 @@ const DIGITAL_VER = 5;
 const DEF_SHELF_OF = Object.assign({'digital-1':'sh-robot'}, Object.fromEntries(DIGITAL_BOOKS.map(b => [b[0], b[1]])));
 const digitalBooks = () => DIGITAL_BOOKS.map(b => ({id:b[0], cat:'digital', shelf:b[1], name:b[2], icon:b[3], color:b[4], teacher:'', desc:'', items:emptyItems()}));
 const defShelves = id => (DEF_SHELVES[id] || []).map(o => Object.assign({}, o));
-const defCats = () => DEF_CATS.map(c => ({id:c.id, name:c.name, en:c.en, icon:c.icon, color:c.color, desc:'', shelves:defShelves(c.id)}));
+const defCats = () => DEF_CATS.map(c => ({id:c.id, name:c.name, en:c.en, icon:c.icon, color:c.color, desc:'', hidePlan:!!c.hidePlan, shelves:defShelves(c.id)}));
 const DEF_SETTINGS = {year:'2026학년도', school:'창신중학교', title:'디지털 연구학교', subtitle:'AI·디지털 기반 수업 혁신, 배움이 자라는 교실',
   introVideo:null, introYoutube:'', introSeconds:15, imgTarget:250000, featuredCat:'aidt', digitalVer:DIGITAL_VER, catVer:CAT_VER};
 const emptyItems = () => ({plan:[],photo:[],result:[]});
@@ -821,7 +883,10 @@ function normalize(s){
     });
   }
   s.settings.digitalVer = DIGITAL_VER;
-  if(savedCatVer < CAT_VER && !s.freshDigital) migrateCats(s);
+  if(savedCatVer < 1 && !s.freshDigital) migrateCats(s);
+  if(savedCatVer < 2){   /* 시민·상상 카테고리 e-Book에서 학업계획서 빼기 */
+    s.settings.categories.forEach(c => { if((c.id === 'literacy' || c.id === 'digital') && c.hidePlan === undefined){ c.hidePlan = true; s.needsSeed = true; } });
+  }
   s.settings.catVer = CAT_VER;
   /* 선반: 카테고리에 선반 정보가 없으면 기본값, 책에 선반이 없으면 기본 배치 */
   s.settings.categories.forEach(c => { if(!Array.isArray(c.shelves)) c.shelves = defShelves(c.id); });
@@ -844,6 +909,8 @@ let state = defaultState();
 const getSub = id => state.subjects.find(s => s.id === id);
 const cats = () => state.settings.categories;
 const getCat = id => cats().find(c => c.id === id);
+const ROMAN = ['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
+const secsOf = s => { const c = getCat(s.cat); return SECTIONS.filter(x => !(x.key === 'plan' && c && c.hidePlan)).map((x,i) => Object.assign({}, x, {num:ROMAN[i]})); };
 const booksOf = cid => state.subjects.filter(s => s.cat === cid);
 const bookBytes = s => SECTIONS.reduce((a,sec) => a + s.items[sec.key].reduce((b,it) => b + (it.size || 0), 0), 0);
 const bookCount = s => SECTIONS.reduce((a,sec) => a + s.items[sec.key].length, 0);
@@ -1148,7 +1215,11 @@ function catCard(c, k){
   const el = document.createElement('div');
   el.className = 'cat-card' + (c.id === LEGACY ? ' legacy' : '') + (feat ? ' feat' : '');
   el.style.setProperty('--c', c.color); el.style.setProperty('--k', k);
-  const shelf = books.slice(0, 14).map((b,i) => `<i style="--sc:${esc(b.color)};height:${62 + ((i*37) % 38)}%"></i>`).join('');
+  /* 세워진 하드커버 책등 — 홈선 · 헤드밴드 · 금박 띠 · 제목(인쇄/띠/라벨 3종) · 마크, 마지막 책은 기대어 섬 */
+  const shown = books.slice(0, 14), SP_H = [94,100,86,97,90,99,84];
+  const spineTitle = (name, hPct) => { const t = plainName(name).replace(/\s*\+\s*/g, '·'); const max = Math.max(2, Math.floor((134 * hPct / 100 - 44) / 11.2));
+    return [...t].length > max ? [...t].slice(0, max - 1).join('').trim() + '…' : t; };
+  const shelf = shown.map((b,i) => `<i class="sp st${(i * 2 + k) % 3}${i === shown.length - 1 && shown.length > 2 ? ' lean' : ''}" style="--sc:${esc(b.color)};--h:${SP_H[i % 7]}%;--w:${[23,19,26,21,24,18,22][i % 7]}px" title="${esc(plainName(b.name))}"><span class="tp"></span><span class="sd"></span><span class="hb"></span><span class="gl"></span><span class="tt">${esc(spineTitle(b.name, SP_H[i % 7]))}</span><span class="gl gb"></span><span class="mk"></span></i>`).join('');
   const head = `<div class="cc-num">${String(k+1).padStart(2,'0')}</div>
       <div class="cc-head"><div class="cc-icon">${esc(c.icon)}</div><div><div class="cc-en">${esc(c.en || '')}</div><div class="cc-name">${esc(c.name)}</div></div></div>
       ${c.desc ? `<p class="cc-desc">${esc(c.desc)}</p>` : ''}`;
@@ -1157,7 +1228,7 @@ function catCard(c, k){
       <div class="cc-chips">${(c.shelves || []).filter(sh => sh.name).length
         ? c.shelves.filter(sh => sh.name).map(sh => `<span>${esc(sh.name)} · ${books.filter(b => b.shelf === sh.id).length}</span>`).join('')
         : books.length ? books.map(b => `<span>${esc(plainName(b.name))}</span>`).join('') : '<em>아직 등록된 항목이 없습니다</em>'}</div>
-      <div class="cc-shelf">${shelf}</div>
+      <div class="cc-shelf real">${shown.length ? '<b class="bookend"></b>' : ''}${shelf}</div>
       <div class="cc-foot"><span>e-Book ${books.length}권 · 자료 ${items}개</span><b>서가 열기 →</b></div>
       ${admin ? '<button class="cc-edit">✏️ 카테고리 편집</button>' : ''}`;
   }
@@ -1207,12 +1278,12 @@ function renderCats(){
     <div class="stat"><b>${total}</b><span>등록 자료</span></div>`;
 }
 function bookCardHTML(s, c, mini){
-  const cnt = SECTIONS.map(sec => s.items[sec.key].length);
+  const SECS = secsOf(s), cnt = SECS.map(sec => s.items[sec.key].length);
   return `<div class="book-card" data-book="${esc(s.id)}" style="--c:${esc(s.color)}"><div class="bc-spine"></div><div class="bc-cover">
       <div class="bc-top">${esc(state.settings.school)} · ${esc(c.name)}</div>
       <div class="bc-icon">${esc(s.icon)}</div><div class="bc-name ${nameCls(s.name)}">${nameHTML(s.name)}</div>
       <div class="bc-teacher">${s.teacher ? esc(s.teacher) + ' 선생님' : ''}</div>
-      <div class="bc-counts">${SECTIONS.map((sec,i) => `<span title="${sec.label}">${sec.icon} ${cnt[i]}</span>`).join('')}</div>
+      <div class="bc-counts">${SECS.map((sec,i) => `<span title="${sec.label}">${sec.icon} ${cnt[i]}</span>`).join('')}</div>
     </div>${admin && !mini ? '<button class="bc-edit">✏️ 자료 관리</button>' : ''}</div>`;
 }
 function addBookCard(c, shelfId, k){
@@ -1281,6 +1352,7 @@ function openCat(id){
   document.querySelectorAll('#catModal [data-c]').forEach(el => el.value = c[el.dataset.c] || '');
   $('#cmShelves').value = (c.shelves || []).map(sh => sh.name).join('\n');
   $('#cmFeatured').checked = state.settings.featuredCat === c.id;
+  $('#cmNoPlan').checked = !!c.hidePlan;
   $('#cmTitle').textContent = `${c.icon} ${c.name} · 카테고리 편집`;
   $('#catModal').classList.add('open');
 }
@@ -1296,6 +1368,7 @@ $('#cmShelves').addEventListener('input', e => {
   c.shelves = lines.map((name,i) => ({id: old[i] ? old[i].id : 'sh' + uid(), name}));
   store.settings(); renderGrid();
 });
+$('#cmNoPlan').addEventListener('change', e => { const c = getCat(curCat); if(!c) return; c.hidePlan = e.target.checked; store.settings(true); renderGrid(); });
 $('#cmFeatured').addEventListener('change', e => {
   state.settings.featuredCat = e.target.checked ? curCat : '';
   store.settings(true); renderGrid();
@@ -1353,7 +1426,7 @@ function renderManage(){
   const hint = FB_MODE ? '이미지 · PDF(쪽마다 자동 변환) / 동영상은 아래 유튜브 링크로' : '이미지 · PDF(쪽마다 자동 변환) · 동영상';
   $('#mgBody').innerHTML = `
     <div class="mg-guide ${over ? 'warn' : ''}">📦 이 책: 자료 <b>${n}개</b> · 약 <b>${MB(bytes)} MB</b>
-      <span>권장: 학업계획서 ${REC.plan}쪽 · 사진 ${REC.photo}장 · 결과물 ${REC.result}개 (총 ${REC.perBook}개 · 약 10MB 이내)</span></div>
+      <span>권장: ${secsOf(s).some(x => x.key === 'plan') ? `학업계획서 ${REC.plan}쪽 · ` : ''}사진 ${REC.photo}장 · 결과물 ${REC.result}개 (총 ${REC.perBook}개 · 약 10MB 이내)</span></div>
     <div class="mg-fields">
       <label>항목명 <span style="font-weight:400;color:#999">(표지 줄바꿈: | , 과목 연결: +)</span><input data-f="name" value="${esc(s.name)}"></label>
       <label>카테고리<select data-f="cat">${cats().map(c => `<option value="${esc(c.id)}" ${c.id === s.cat ? 'selected' : ''}>${esc(c.icon)} ${esc(c.name)}</option>`).join('')}</select></label>
@@ -1363,7 +1436,7 @@ function renderManage(){
       <label>표지 색상<input type="color" data-f="color" value="${esc(s.color)}"></label>
       <label class="wide">수업 소개 (목차 페이지에 표시)<textarea data-f="desc" rows="2" placeholder="예: 생성형 AI를 활용한 토론 수업으로 비판적 사고력을 기르는 수업">${esc(s.desc)}</textarea></label>
     </div>
-    ${SECTIONS.map(sec => `<section class="mg-sec">
+    ${secsOf(s).map(sec => `<section class="mg-sec">
       <h4>${sec.icon} ${sec.label} <small>${s.items[sec.key].length}개 · 권장 ${REC[sec.key]}개 이내</small></h4>
       <label class="drop" data-key="${sec.key}"><input type="file" multiple accept="${accept}" data-key="${sec.key}">
         <b>클릭하거나 파일을 끌어다 놓으세요</b><span>${hint} / 한글(hwp)은 PDF로 저장 후 올려주세요</span></label>
@@ -1564,7 +1637,7 @@ const DUR = 950;
 
 function buildPages(s){
   const out = [{type:'cover'}, {type:'toc'}];
-  SECTIONS.forEach(sec => {
+  secsOf(s).forEach(sec => {
     if(out.length % 2 === 1) out.push({type:'blank'});
     out.push({type:'divider', sec});
     const items = s.items[sec.key];
@@ -1592,7 +1665,7 @@ function pageHTML(p, idx, s){
         <div class="cv-sub">${esc((getCat(s.cat) || {}).en || 'CLASS REPORT')}</div>
         ${s.teacher ? `<div class="cv-teacher">담당 교사 · ${esc(s.teacher)}</div>` : '<div class="cv-teacher">운영 보고서</div>'}</div></div>`;
     case 'toc': {
-      const rows = SECTIONS.map(sec => {
+      const rows = secsOf(s).map(sec => {
         const di = P.findIndex(x => x.type === 'divider' && x.sec.key === sec.key);
         return `<li class="no-flip" data-go="${di}"><span class="n">${sec.num}</span><span class="t">${sec.label}</span><span class="c">${s.items[sec.key].length}건</span><span class="p">${di}</span></li>`;
       }).join('');
@@ -1634,7 +1707,7 @@ function openBook(id){
   $('#rTitle').innerHTML = `${esc(s.icon)} ${esc(plainName(s.name))}<small>${esc((getCat(s.cat) || {}).name || '')} · ${esc(state.settings.year)} ${esc(state.settings.school)} ${esc(state.settings.title)}</small>`;
   const r = $('#rbRange'); r.max = L; r.value = 0;
   $('#rChips').innerHTML = `<button class="chip" data-p="0">표지</button>` +
-    SECTIONS.map(sec => `<button class="chip" data-p="${P.findIndex(x => x.type === 'divider' && x.sec.key === sec.key)}">${sec.icon} ${sec.label}</button>`).join('');
+    secsOf(s).map(sec => `<button class="chip" data-p="${P.findIndex(x => x.type === 'divider' && x.sec.key === sec.key)}">${sec.icon} ${sec.label}</button>`).join('');
   $('#reader').classList.add('open'); document.body.style.overflow = 'hidden';
   layout(); updateUI();
 }
