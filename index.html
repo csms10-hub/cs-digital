@@ -274,6 +274,9 @@ footer{text-align:center;padding:26px;color:#6f7ea6;font-size:12.5px;border-top:
 .mg-fields .wide{grid-column:1/-1}
 .mg-fields input,.mg-fields textarea,.set-fields input{padding:9px 11px;border:1px solid #d6d0c2;border-radius:9px;font-size:14px;background:#fff;color:#222}
 .mg-fields input[type=color]{padding:2px;height:40px}
+.mg-fields > label{min-width:0}
+.mg-fields input,.mg-fields select,.mg-fields textarea{width:100%;min-width:0;box-sizing:border-box}
+.mg-fields input[type=color]{width:72px}
 .mg-sec{background:#fff;border:1px solid #e6e0d3;border-radius:14px;padding:14px;margin-bottom:14px}
 .mg-sec h4{font-size:15.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .mg-sec h4 small{font-weight:500;color:#888;font-size:12.5px}
@@ -349,6 +352,14 @@ footer{text-align:center;padding:26px;color:#6f7ea6;font-size:12.5px;border-top:
 .pg-media img.ld{width:80%;height:55%;border:none!important;outline:none!important;box-shadow:none!important;transform:none!important;border-radius:8px;background:linear-gradient(90deg,#ece3cf 25%,#f7f1e4 50%,#ece3cf 75%);background-size:200% 100%;animation:shimmer 1.2s linear infinite}
 @keyframes shimmer{from{background-position:200% 0}to{background-position:0 0}}
 .pg-media iframe.yt{width:100%;aspect-ratio:16/9;border:0;border-radius:6px;box-shadow:0 8px 20px rgba(60,40,10,.35);background:#000}
+.v-wrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:.5em}
+.pg-media video[data-lsrc]{width:100%;max-height:100%;background:#000;border-radius:6px}
+.v-open{font-size:.7em;color:#8a7350;text-decoration:none;border:1px solid #d9c9a6;border-radius:999px;padding:.25em .9em;background:rgba(255,255,255,.75)}
+.v-open:hover{background:#fff}
+.v-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45em;width:82%;aspect-ratio:16/10;border-radius:12px;background:#2b2418;color:#fff;text-decoration:none;box-shadow:0 8px 20px rgba(60,40,10,.35)}
+.v-card .v-play{width:2.6em;height:2.6em;border-radius:50%;background:#fff;color:#2b2418;display:grid;place-items:center;font-size:1.25em;padding-left:.15em}
+.v-card b{font-size:1em}.v-card small{font-size:.7em;opacity:.8}
+.th-link{background:#1f2633;color:#fff;font-size:28px}
 .sec-plan .pg-media img{box-shadow:0 2px 10px rgba(60,40,10,.25);border:1px solid #e2d7bf;background:#fff}
 .sec-photo .pg-media img,.sec-photo .pg-media video{border:calc(var(--pw) * .02) solid #fff;border-bottom-width:calc(var(--pw) * .055);box-shadow:0 6px 16px rgba(60,40,10,.3);transform:rotate(-1.4deg)}
 .sec-photo.alt .pg-media img,.sec-photo.alt .pg-media video{transform:rotate(1.2deg)}
@@ -592,9 +603,9 @@ footer{text-align:center;padding:26px;color:#6f7ea6;font-size:12.5px;border-top:
       </div>
       <div class="set-box">
         <h5>🎬 인트로 영상 (선택)</h5>
-        비워 두면 애니메이션 타이틀 인트로가 재생됩니다. 유튜브 링크를 넣으면 그 영상을 배경으로 타이틀이 함께 재생됩니다.
+        비워 두면 애니메이션 타이틀 인트로가 재생됩니다. 유튜브 링크나 영상 파일 주소(mp4 등)를 넣으면 그 영상을 배경으로 타이틀이 함께 재생됩니다. (구글 드라이브 영상은 자동 재생이 막혀 있어 인트로 배경으로는 쓸 수 없습니다)
         <div class="set-fields" style="margin-top:10px">
-          <label class="wide">유튜브 링크<input id="sYT" placeholder="https://youtu.be/..."></label>
+          <label class="wide">영상 링크 (유튜브 또는 mp4 주소)<input id="sYT" placeholder="https://youtu.be/... 또는 https://.../intro.mp4"></label>
           <label>인트로 재생 시간(초)<input id="sYTsec" type="number" min="5" max="120"></label>
         </div>
         <div class="local-only" style="margin-top:12px">또는 영상 파일 직접 올리기 (Firebase 미연결 시에만)
@@ -898,6 +909,34 @@ function normalize(s){
   delete s.freshDigital;
   return s;
 }
+/* 영상 링크 해석: 유튜브 · 구글 드라이브 · 비메오 · 네이버TV · 카카오TV · 드롭박스 · 영상 파일(mp4 등) · 퍼가기(embed) 주소 · 그 밖의 링크 */
+const VPROV = {youtube:'YouTube', gdrive:'구글 드라이브', vimeo:'Vimeo', naver:'네이버TV', kakao:'카카오TV', file:'영상 파일', embed:'영상', web:'웹 링크'};
+function parseVideo(raw){
+  let u = String(raw || '').trim();
+  const m0 = u.match(/<iframe[^>]+src=["']([^"']+)["']/i); if(m0) u = m0[1];      // 퍼가기 코드를 통째로 붙여넣은 경우
+  if(/^\/\//.test(u)) u = 'https:' + u;
+  if(!/^https?:\/\//i.test(u)){ if(/^[\w-]+(\.[\w-]+)+\//.test(u)) u = 'https://' + u; else return null; }
+  let url; try{ url = new URL(u); }catch(e){ return null; }
+  const h = url.hostname.replace(/^(www|m)\./, '');
+  if(/(^|\.)youtube(-nocookie)?\.com$|^youtu\.be$/.test(h)){ const id = parseYT(u); if(id) return {kind:'youtube', prov:'youtube', yt:id}; }
+  let m;
+  if(h === 'drive.google.com' || h === 'docs.google.com'){
+    m = u.match(/\/d\/([\w-]{20,})/); const id = m ? m[1] : url.searchParams.get('id');
+    if(id) return {kind:'link', prov:'gdrive', url:u, embed:`https://drive.google.com/file/d/${id}/preview`};
+  }
+  if(/(^|\.)vimeo\.com$/.test(h) && (m = u.match(/vimeo\.com\/(?:.*?\/)?(?:video\/)?(\d{6,})(?:\/([\da-f]{6,}))?/)))
+    return {kind:'link', prov:'vimeo', url:u, embed:`https://player.vimeo.com/video/${m[1]}${m[2] ? '?h=' + m[2] : ''}`};
+  if(h === 'tv.naver.com' && (m = u.match(/\/(?:v|embed)\/(\d+)/))) return {kind:'link', prov:'naver', url:u, embed:`https://tv.naver.com/embed/${m[1]}`};
+  if(/(^|\.)kakao\.com$/.test(h) && (m = u.match(/(?:cliplink|\/v)\/(\d+)/))) return {kind:'link', prov:'kakao', url:u, embed:`https://play-tv.kakao.com/embed/player/cliplink/${m[1]}`};
+  if(/(^|\.)dropbox\.com$/.test(h)){ url.searchParams.delete('dl'); url.searchParams.set('raw', '1'); return {kind:'link', prov:'file', url:u, embed:url.toString()}; }
+  if(/\.(mp4|webm|ogv|ogg|mov|m4v)$/i.test(url.pathname)) return {kind:'link', prov:'file', url:u, embed:u};
+  if(/\/(embed|player)\b/i.test(url.pathname) || /^(player|embed)\./i.test(h)) return {kind:'link', prov:'embed', url:u, embed:u};
+  return {kind:'link', prov:'web', url:u, embed:''};
+}
+const vInfo = it => it.kind === 'youtube'
+  ? {prov:'youtube', url:`https://youtu.be/${it.yt}`, embed:`https://www.youtube-nocookie.com/embed/${it.yt}?enablejsapi=1&rel=0&playsinline=1`}
+  : (parseVideo(it.url) || {prov:'web', url:it.url, embed:''});
+const isLinky = it => !!it && (it.kind === 'youtube' || it.kind === 'link');
 function parseYT(u){
   if(!u) return null; u = String(u).trim();
   const m = u.match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/|live\/)([A-Za-z0-9_-]{11})/);
@@ -1008,7 +1047,7 @@ const store = {
   },
   async removeMedia(it){
     mediaCache.delete(it.id);
-    if(!FB_MODE || it.kind === 'youtube') return true;
+    if(!FB_MODE || isLinky(it)) return true;
     return fbWrite(() => fb.deleteDoc(fb.doc(fb.db,'media',it.id)));
   },
   async removeSubject(s){
@@ -1034,7 +1073,7 @@ const store = {
 const mediaCache = new Map(), inflight = new Map();
 const cachedSrc = it => it.src || mediaCache.get(it.id) || null;
 function fetchMedia(it){
-  if(!it || it.kind === 'youtube') return Promise.resolve(null);
+  if(!it || isLinky(it)) return Promise.resolve(null);
   const c = cachedSrc(it); if(c) return Promise.resolve(c);
   if(!FB_MODE) return Promise.resolve(null);
   if(inflight.has(it.id)) return inflight.get(it.id);
@@ -1124,6 +1163,7 @@ function playIntro(){
   clearTimeout(autoEnterT);
   v.pause(); v.removeAttribute('src'); v.style.display = 'none'; yt.innerHTML = '';
   const ytId = parseYT(st.introYoutube);
+  const iv = !ytId && st.introYoutube ? parseVideo(st.introYoutube) : null;
   let dur = 11;
   if(st.introVideo && !FB_MODE){
     intro.classList.add('has-video','no-prog'); v.style.display = 'block'; v.src = st.introVideo; v.currentTime = 0;
@@ -1131,6 +1171,10 @@ function playIntro(){
   } else if(ytId){
     intro.classList.add('has-video');
     yt.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&modestbranding=1&playsinline=1&rel=0" allow="autoplay; encrypted-media" title="인트로 영상"></iframe>`;
+    dur = Math.max(5, Math.min(120, +st.introSeconds || 15));
+  } else if(iv && iv.prov === 'file'){
+    intro.classList.add('has-video'); v.style.display = 'block'; v.muted = true; v.loop = true; v.onended = null;
+    v.src = iv.embed; v.play().catch(()=>{});
     dur = Math.max(5, Math.min(120, +st.introSeconds || 15));
   }
   intro.style.setProperty('--introDur', (dur || 11) + 's');
@@ -1412,6 +1456,7 @@ function thumbHTML(it, i, key){
   const src = cachedSrc(it);
   const media = it.kind === 'youtube'
     ? `<div class="th-media" style="background-image:url('https://i.ytimg.com/vi/${esc(it.yt)}/mqdefault.jpg')"><span class="yt-badge">▶ YouTube</span><i>${i+1}</i></div>`
+    : it.kind === 'link' ? `<div class="th-media th-link">🎬<span class="yt-badge" style="background:#1a73e8">▶ ${esc(VPROV[vInfo(it).prov] || '영상')}</span><i>${i+1}</i></div>`
     : it.kind === 'video' ? `<div class="th-media">🎬<i>${i+1}</i></div>`
     : `<div class="th-media" data-mid="${it.id}" style="${src ? `background-image:url('${src}')` : ''}"><i>${i+1}</i></div>`;
   return `<div class="thumb" data-key="${key}" data-i="${i}">${media}
@@ -1423,7 +1468,7 @@ function renderManage(){
   $('#mgTitle').textContent = `${s.icon} ${plainName(s.name)} · 자료 관리`;
   const n = bookCount(s), bytes = bookBytes(s), over = n > REC.perBook;
   const accept = FB_MODE ? 'image/*,application/pdf' : 'image/*,application/pdf,video/*';
-  const hint = FB_MODE ? '이미지 · PDF(쪽마다 자동 변환) / 동영상은 아래 유튜브 링크로' : '이미지 · PDF(쪽마다 자동 변환) · 동영상';
+  const hint = FB_MODE ? '이미지 · PDF(쪽마다 자동 변환) / 동영상은 아래 영상 링크로' : '이미지 · PDF(쪽마다 자동 변환) · 동영상';
   $('#mgBody').innerHTML = `
     <div class="mg-guide ${over ? 'warn' : ''}">📦 이 책: 자료 <b>${n}개</b> · 약 <b>${MB(bytes)} MB</b>
       <span>권장: ${secsOf(s).some(x => x.key === 'plan') ? `학업계획서 ${REC.plan}쪽 · ` : ''}사진 ${REC.photo}장 · 결과물 ${REC.result}개 (총 ${REC.perBook}개 · 약 10MB 이내)</span></div>
@@ -1440,7 +1485,7 @@ function renderManage(){
       <h4>${sec.icon} ${sec.label} <small>${s.items[sec.key].length}개 · 권장 ${REC[sec.key]}개 이내</small></h4>
       <label class="drop" data-key="${sec.key}"><input type="file" multiple accept="${accept}" data-key="${sec.key}">
         <b>클릭하거나 파일을 끌어다 놓으세요</b><span>${hint} / 한글(hwp)은 PDF로 저장 후 올려주세요</span></label>
-      <div class="yt-add"><input placeholder="유튜브 링크 붙여넣기 (일부 공개 영상 권장)" data-yt="${sec.key}"><button class="pbtn" data-ytadd="${sec.key}">＋ 영상 추가</button></div>
+      <div class="yt-add"><input placeholder="영상 링크 붙여넣기 — 유튜브 · 구글 드라이브 · 비메오 · 네이버TV · mp4 주소 등" data-yt="${sec.key}"><button class="pbtn" data-ytadd="${sec.key}">＋ 영상 추가</button></div>
       <div class="thumbs">${s.items[sec.key].map((it,i) => thumbHTML(it,i,sec.key)).join('')}</div>
     </section>`).join('')}`;
   SECTIONS.forEach(sec => s.items[sec.key].forEach(it => { if(it.kind === 'image' && !cachedSrc(it)) loadAndPaint(it); }));
@@ -1458,10 +1503,16 @@ mgBody.addEventListener('click', async e => {
   const s = getSub(curManage); if(!s) return;
   const ya = e.target.closest('[data-ytadd]');
   if(ya){
-    const key = ya.dataset.ytadd, inp = mgBody.querySelector(`[data-yt="${key}"]`), id = parseYT(inp.value);
-    if(!id){ toast('⚠️ 올바른 유튜브 링크가 아닙니다.'); return; }
-    s.items[key].push({id:uid(), kind:'youtube', yt:id, caption:'수업 영상', size:0});
-    await store.subject(s, true); renderManage(); renderGrid(); toast('✅ 유튜브 영상을 추가했습니다.'); return;
+    const key = ya.dataset.ytadd, inp = mgBody.querySelector(`[data-yt="${key}"]`), v = parseVideo(inp.value);
+    if(!v){ toast('⚠️ 영상 링크(https://…)를 붙여 넣어 주세요.'); return; }
+    s.items[key].push(v.kind === 'youtube'
+      ? {id:uid(), kind:'youtube', yt:v.yt, caption:'수업 영상', size:0}
+      : {id:uid(), kind:'link', url:v.url, caption:'수업 영상', size:0});
+    await store.subject(s, true); renderManage(); renderGrid();
+    toast(v.prov === 'gdrive' ? '✅ 구글 드라이브 영상을 추가했습니다. 파일 공유를 「링크가 있는 모든 사용자」로 해 두어야 재생됩니다.'
+        : v.prov === 'web' ? '✅ 링크를 추가했습니다. 이 사이트는 책 안에서 바로 재생되지 않을 수 있어 「영상 보기」 버튼으로 새 창에서 열립니다.'
+        : `✅ ${VPROV[v.prov]} 영상을 추가했습니다.`, 5000);
+    return;
   }
   const b = e.target.closest('.th-act button'); if(!b) return;
   const th = b.closest('.thumb'), arr = s.items[th.dataset.key], i = +th.dataset.i;
@@ -1552,7 +1603,7 @@ async function handleFiles(key, files){
       if(f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) await pdfPages(f, prog, (src, cap) => add(src, cap));
       else if(f.type.startsWith('image/')) await add(await compressImage(f), baseName(f.name));
       else if(f.type.startsWith('video/')){
-        if(FB_MODE){ toast('🎬 동영상은 유튜브에 올린 뒤 링크로 추가해 주세요.', 4000); failed++; continue; }
+        if(FB_MODE){ toast('🎬 동영상은 유튜브·구글 드라이브 등에 올린 뒤 링크로 추가해 주세요.', 4000); failed++; continue; }
         if(f.size > 40*1024*1024 && !confirm(`${f.name}은(는) ${(f.size/1048576).toFixed(0)}MB입니다. 계속할까요?`)) continue;
         await add(await readDataURL(f), baseName(f.name), 'video');
       } else failed++;
@@ -1651,7 +1702,13 @@ function buildPages(s){
 }
 const head = (sec, s) => `<div class="pg-head"><span>${sec.num}. ${sec.label}</span><span>${esc(plainName(s.name))}</span></div><div class="pg-rule"></div>`;
 function mediaHTML(it, idx){
-  if(it.kind === 'youtube') return `<iframe class="no-flip yt" src="https://www.youtube-nocookie.com/embed/${esc(it.yt)}?enablejsapi=1&rel=0&playsinline=1" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="수업 영상"></iframe>`;
+  if(isLinky(it)){
+    const v = vInfo(it); let dom = ''; try{ dom = new URL(v.url).hostname.replace(/^www\./, ''); }catch(e){}
+    const open = `<a class="no-flip v-open" href="${esc(v.url)}" target="_blank" rel="noopener">새 창에서 보기 ↗</a>`;
+    if(v.prov === 'file') return `<div class="v-wrap no-flip"><video class="no-flip" data-lsrc="${esc(v.embed)}" data-pg="${idx}" controls playsinline preload="metadata"></video>${open}</div>`;
+    if(v.embed) return `<div class="v-wrap no-flip"><iframe class="no-flip yt" data-lsrc="${esc(v.embed)}" data-pg="${idx}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="수업 영상"></iframe>${open}</div>`;
+    return `<a class="no-flip v-card" href="${esc(v.url)}" target="_blank" rel="noopener"><span class="v-play">▶</span><b>영상 보기</b><small>${esc(dom)} · 새 창에서 열립니다</small></a>`;
+  };
   const src = cachedSrc(it);
   if(it.kind === 'video') return `<video class="no-flip" data-mid="${it.id}" src="${src || ''}" controls playsinline preload="metadata"></video>`;
   return `<img data-mid="${it.id}" src="${src || PIX}" class="${src ? '' : 'ld'}" alt="${esc(it.caption)}" draggable="false"><button class="zoom no-flip" data-zoom="${idx}" title="크게 보기">⤢</button>`;
@@ -1723,7 +1780,7 @@ window.addEventListener('resize', layout);
 /* 지금 보는 펼침면 앞뒤의 사진만 불러옴 → 무료 전송량 절약 */
 function ensureAround(){
   const from = Math.max(0, 2*flipped - 3), to = Math.min(P.length - 1, 2*flipped + 4);
-  for(let i=from;i<=to;i++){ const p = P[i]; if(p && p.type === 'item' && p.it.kind !== 'youtube' && !cachedSrc(p.it)) loadAndPaint(p.it); }
+  for(let i=from;i<=to;i++){ const p = P[i]; if(p && p.type === 'item' && !isLinky(p.it) && !cachedSrc(p.it)) loadAndPaint(p.it); }
 }
 function updateUI(){
   const book = $('#book');
@@ -1737,7 +1794,15 @@ function updateUI(){
   document.querySelectorAll('#rChips .chip').forEach((c,i) => { if(+c.dataset.p <= right) act = i; });
   document.querySelectorAll('#rChips .chip').forEach((c,i) => c.classList.toggle('act', i === act));
   document.querySelectorAll('#book video').forEach(v => { if(!v.paused) v.pause(); });
-  document.querySelectorAll('#book iframe.yt').forEach(f => { try{ f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*'); }catch(e){} });
+  const vis = new Set([2*flipped - 1, 2*flipped]);
+  document.querySelectorAll('#book [data-lsrc]').forEach(el => {
+    const on = vis.has(+el.dataset.pg);
+    if(on && el.dataset.on !== '1'){ el.src = el.dataset.lsrc; el.dataset.on = '1'; }
+    else if(!on && el.dataset.on === '1'){
+      if(el.tagName === 'VIDEO'){ el.pause(); el.removeAttribute('src'); el.load(); } else el.src = 'about:blank';
+      el.dataset.on = '0';
+    }
+  });
   if(!jumping) ensureAround();
 }
 function flipSound(){
